@@ -1,6 +1,8 @@
 /********************************************************************************/
 /* Project: Project 02: Syntactical Analyzer					*/
-/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu			*/
+/* Authorized Users/Secondary Authors: Team K: Ivan Lim, Brooke Borges, 
+/*                                              Chad Lewis
+/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu			                  */
 /* Date: 16 April 2017								*/
 /* Description:	This program is meant to work in conjunction with the class     */
 /*              contained in the file LexicalAnalyzer.h. These classes will     */
