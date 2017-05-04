@@ -1,9 +1,9 @@
 /********************************************************************************/
-/* Project: Project 02: Syntactical Analyzer					*/
-/* Authorized Users/Secondary Authors: Team K: Ivan Lim, Brooke Borges, 
-/*                                              Chad Lewis
+/* Project: Project 02: Syntactical Analyzer					                          */
+/* Authorized Users/Secondary Authors: Team K: Ivan Lim, Brooke Borges,         */
+/*                                              Chad Lewis                      */
 /* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu			                  */
-/* Date: 16 April 2017								*/
+/* Date: 16 April 2017								                                          */
 /* Description:	This program is meant to work in conjunction with the class     */
 /*              contained in the file LexicalAnalyzer.h. These classes will     */
 /*              read in scheme code from a .ss file and tokenize the lexemes    */
@@ -88,6 +88,7 @@ SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
 /* An instance of the LexicalAnalyzer will also get created.                    */
 /********************************************************************************/
   lex = new LexicalAnalyzer (filename);
+  codegen = new CodeGenerator( filename );
   int fnlength = strlen (filename);
   filename[fnlength-2] = 'p';
   filename[fnlength-1] = '2';
@@ -105,6 +106,7 @@ SyntacticalAnalyzer::~SyntacticalAnalyzer ()
 /* and close the debug file opened.                                             */
 /********************************************************************************/
   delete lex;
+  delete codegen;
   p2file.close();
 }
 
