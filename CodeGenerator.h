@@ -9,6 +9,9 @@ class CodeGenerator {
 public:
 	CodeGenerator( char * );
 	~CodeGenerator();
+
+	void startProgram();
+
 private:
 	ofstream cppFile;
 };
