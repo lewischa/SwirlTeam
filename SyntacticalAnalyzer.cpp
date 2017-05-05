@@ -398,17 +398,9 @@ int SyntacticalAnalyzer::else_part()
   }
   else
   {
-  	// codegen->indentCode();
-  	// codegen->writeCode("else\n");
-  	// codegen->indentCode();
-  	// codegen->writeCode("{\n");
-  	// codegen->addIndent();
   	codegen->else_begin();
     errors += stmt();
     codegen->endControlStructure();
-    // codegen->minusIndent();
-    // codegen->indentCode();
-    // codegen->writeCode("}\n");
   }
 
   p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
