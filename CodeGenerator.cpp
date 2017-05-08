@@ -5,6 +5,8 @@
 using namespace std;
 
 CodeGenerator::CodeGenerator( char * file ) {
+	isMain = false;
+
 	int fileNameLength = strlen( file );
 	// cout << "file name: " << file << endl;
 	// cout << "length: " << fileNameLength << endl;
@@ -33,18 +35,31 @@ void CodeGenerator::writeIncludes() {
 
 void CodeGenerator::defineMain()
 {
+	isMain = true;
 	cppFile << "int main(";
 }
 
 
 void CodeGenerator::defineFunction( string ident )
 {
+	isMain = false;
 	cppFile << "Object " << ident << "(";
 }
 
 
 void CodeGenerator::endFunction()
 {
+	if (isMain)
+	{
+		indentCode();
+		cppFile << "return 0;\n";
+		minusIndent();
+	} else
+	{
+		indentCode();
+		cppFile << "return Object();\n";
+		minusIndent();
+	}
 	cppFile << "}\n\n";
 }
 
@@ -104,13 +119,17 @@ void CodeGenerator::endControlStructure()
 }
 
 
+void CodeGenerator::newline()
+{
+	indentCode();
+	cppFile << "cout << endl;\n";
+}
 
 
-
-// void CodeGenerator::callFunction( string functionName )
-// {
-// 	cppFile << functionName << "(";
-// }
+void CodeGenerator::callFunction( string functionName )
+{
+	cppFile << functionName << "(";
+}
 
 
 void CodeGenerator::addParameter( string parameter )
@@ -139,6 +158,44 @@ void CodeGenerator::endParameters()
 	cppFile << ")\n";
 	cppFile << "{\n";
 }
+
+
+void CodeGenerator::makeObject_begin()
+{
+	cppFile << "Object(";
+}
+
+
+
+void CodeGenerator::makeObject_end()
+{
+	cppFile << ")";
+}
+
+
+
+void CodeGenerator::addToListStack( string listItem )
+{
+	listStack.push_back( listItem );
+}
+
+
+void CodeGenerator::endList()
+{
+	cppFile << "(";
+	for ( int i = 0; i < listStack.size(); i++ )
+	{
+		cppFile << listStack.at(i);
+		if ( i != listStack.size() - 1 )
+		{
+			cppFile << " ";
+		}
+	}
+	cppFile << ")";
+	listStack.clear();
+	makeObject_end();
+}
+
 
 
 void CodeGenerator::addIndent()
