@@ -57,7 +57,7 @@ void CodeGenerator::endFunction()
 	} else
 	{
 		indentCode();
-		cppFile << "return Object();\n";
+		cppFile << "return __retVal;\n";
 		minusIndent();
 	}
 	cppFile << "}\n\n";
@@ -66,14 +66,14 @@ void CodeGenerator::endFunction()
 
 void CodeGenerator::returnIdentifier( string toReturn )
 {
-	cppFile << "return " << toReturn << ";\n";
+	indentCode();
+	cppFile << "__retVal = Object(" << toReturn << ");\n";
 }
 
 
 void CodeGenerator::returnCreatedObject( string toReturn )
 {
-	cppFile << "Object toReturn(" << toReturn << ");\n";
-	cppFile << "return toReturn;\n";
+	cppFile << "return __retVal;\n";
 }
 
 
@@ -157,7 +157,14 @@ void CodeGenerator::endParameters()
 
 	cppFile << ")\n";
 	cppFile << "{\n";
-}
+	if (isMain != 1)	
+	{
+		addIndent();
+		indentCode();
+		minusIndent();
+		cppFile << "Object __retVal;\n";
+	}
+} 
 
 
 void CodeGenerator::makeObject_begin()

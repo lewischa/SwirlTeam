@@ -30,10 +30,10 @@ class SyntacticalAnalyzer
 	int define ();
 	int more_defines ();
 	int param_list ();
-	int stmt ();
+	int stmt ( bool shouldReturn = false );
 	int literal ();
-	int action ();
-	int stmt_list ();
+	int action (bool shouldReturn = false );
+	int stmt_list ( bool shouldReturn = false, string separator = "" );
 	int quoted_lit ();
 	int any_other_token ();
 	int more_tokens ();
