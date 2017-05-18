@@ -1,9 +1,12 @@
+#ifndef OBJECT_H
+#define OBJECT_H
+
 #include <iostream>
 #include <sstream>
 #include <vector>
 using namespace std;
 
-enum obj_type {NONE, INT, REAL, STRING, LIST};
+enum obj_type {NONETYPE, INT, REAL, STRING, LIST};
 	
 class Object
 {
@@ -47,3 +50,5 @@ class Object
 	string strval;
 	vector <Object> listval;
 };
+
+#endif

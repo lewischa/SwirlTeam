@@ -201,18 +201,35 @@ int SyntacticalAnalyzer::define ()
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: IDENT_T");
       errors++;     
     }
+  else
+  	{
+  		if (lex->GetLexeme() == "main")
+  		{
+  			codegen->defineMain();
+  		}
+  		else 
+  		{
+  			codegen->defineFunction(lex->GetLexeme());
+  		}
+  	}
   
   token = lex->GetToken();
   
   errors += param_list();
 
+  codegen->addIndent();
+
   token = lex->GetToken();
 
   errors += stmt();
 
+  codegen->writeCode(";");
+
   errors += stmt_list();
 
   token = lex->GetToken();
+
+  codegen->endFunction();
 
   p2file << "Ending <define>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -264,6 +281,7 @@ int SyntacticalAnalyzer::param_list ()
   
   if (token == IDENT_T)
   {
+  	codegen->addParameter( lex->GetLexeme() );
     token = lex->GetToken();
     errors += param_list();
   }
@@ -271,6 +289,10 @@ int SyntacticalAnalyzer::param_list ()
   {
     lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
     errors++;
+  }
+  else
+  {
+  	codegen->endParameters();
   }
 
   p2file << "Ending <param_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
@@ -296,6 +318,7 @@ int SyntacticalAnalyzer::stmt ()
 
   if (token == IDENT_T)
   {
+  	codegen->writeCode( lex->GetLexeme() );
     token = lex->GetToken();
   }
   else if (token == LPAREN_T)
@@ -309,9 +332,14 @@ int SyntacticalAnalyzer::stmt ()
     }
     token = lex->GetToken(); // gets rparen
   }
-  else if ((token == QUOTE_T) || (token == NUMLIT_T))
+  else if (token == QUOTE_T)
   {
     errors += literal();
+  }
+  else if (token == NUMLIT_T)
+  {
+  	codegen->writeCode( lex->GetLexeme() );
+  	errors += literal();
   }
   else
   {
@@ -370,7 +398,9 @@ int SyntacticalAnalyzer::else_part()
   }
   else
   {
+  	codegen->else_begin();
     errors += stmt();
+    codegen->endControlStructure();
   }
 
   p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
@@ -400,8 +430,10 @@ int SyntacticalAnalyzer::literal()
   }
   else if (token == QUOTE_T)
   {
+  	codegen->makeObject_begin();
     token = lex->GetToken();
     errors += quoted_lit();
+    codegen->makeObject_end();
   }
   else
   {
@@ -455,13 +487,17 @@ int SyntacticalAnalyzer::action()
   
   if (token == NEWLINE_T)
   {
+  	codegen->newline();
     token = lex->GetToken();
   }
   else if (token == IF_T)
   {
+  	codegen->if_beginCondition();
     token = lex->GetToken();
     errors += stmt();
+    codegen->if_endCondition();
     errors += stmt();
+    codegen->endControlStructure();
     errors += else_part();
   }
   else if(token == CONS_T)
@@ -470,21 +506,150 @@ int SyntacticalAnalyzer::action()
     errors += stmt();
     errors += stmt();
   }
-  else if ((token == NOT_T) || (token == NUMBERP_T) || (token == SYMBOLP_T) || (token == LISTP_T) || (token == ZEROP_T) || 
-      (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T) || (token == DISPLAY_T) || (token == LISTOP_T))
+  else if (token == NOT_T)
   {
+  	codegen->writeCode("!(");
     token = lex->GetToken();
     errors += stmt(); 
+    codegen->writeCode(")");
   }
-  else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
-           (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
+  else if (token == DISPLAY_T)
+  {
+  	// DISPLAY STUFF HERE
+  	token = lex->GetToken();
+    errors += stmt();
+  }
+  else if (token == LISTOP_T)
+  {
+  	// LISTOP STUFF HERE
+  	codegen->callFunction( lex->GetLexeme() );
+  	token = lex->GetToken();
+    errors += stmt();
+    codegen->writeCode(")");
+  }
+  else if (token == NUMBERP_T)
+  {
+  	codegen->writeCode("numberp(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == SYMBOLP_T)
+  {
+  	codegen->writeCode("symbolp(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == LISTP_T)
+  {
+  	codegen->writeCode("listp(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == ZEROP_T)
+  {
+  	codegen->writeCode("zerop(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == CHARP_T)
+  {
+  	codegen->writeCode("charp(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == STRINGP_T)
+  {
+  	codegen->writeCode("stringp(");
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == NULLP_T)
+  {
+  	codegen->writeCode( "nullp(" );
+  	token = lex->GetToken();
+  	errors += stmt();
+  	codegen->writeCode(")");
+  }
+  else if (token == PLUS_T)
   {
     token = lex->GetToken();
     errors += stmt_list();
   }
-  else if((token == MINUS_T) || (token == DIV_T))
+  else if (token == AND_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == OR_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == MULT_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == EQUALTO_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == GT_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == LT_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == GTE_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == LTE_T)
+  {
+  	
+  	token = lex->GetToken();
+    errors += stmt_list();
+  }
+  else if (token == IDENT_T)
+  {
+  	codegen->callFunction( lex->GetLexeme() );
+  	token = lex->GetToken();
+    errors += stmt_list();
+    codegen->writeCode(")");
+  }
+  else if(token == MINUS_T)
   {
     token = lex->GetToken();
+    errors += stmt();
+    errors += stmt_list();
+    if (token != RPAREN_T)
+    {
+      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+      errors++; 
+    }
+  }
+  else if (token == DIV_T)
+  {
+  	token = lex->GetToken();
     errors += stmt();
     errors += stmt_list();
     if (token != RPAREN_T)

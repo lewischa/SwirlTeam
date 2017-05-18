@@ -1,0 +1,13 @@
+* Test files
+
+* Add boolean to stmt() to indicate whether it should be a returned value
+	- This should be changed for each call to stmt()
+
+* Add 'separator' character to stmt_list calls
+	- Maybe this needs to be passed to stmt() too?
+	- '+'
+	- '-'
+	- '*'
+	- '/'
+	- '||'
+	- '&&'
