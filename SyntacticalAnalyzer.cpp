@@ -221,7 +221,7 @@ int SyntacticalAnalyzer::define ()
 
   token = lex->GetToken();
 
-  errors += stmt(true);
+  errors += stmt(true, "");
 
   // codegen->writeCode(";");
 
@@ -301,7 +301,7 @@ int SyntacticalAnalyzer::param_list ()
 }
 
 
-int SyntacticalAnalyzer::stmt ( bool shouldReturn )
+int SyntacticalAnalyzer::stmt ( bool shouldReturn, string separator )
 {
 /********************************************************************************/
 /* This function will check the rule at STMT and also the current token.        */
@@ -331,7 +331,7 @@ int SyntacticalAnalyzer::stmt ( bool shouldReturn )
   else if (token == LPAREN_T)
   {
     token = lex->GetToken();
-    errors += action( shouldReturn );
+    errors += action( shouldReturn, separator );
     if (token != RPAREN_T)
     {
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
@@ -383,9 +383,14 @@ int SyntacticalAnalyzer::stmt_list( bool shouldReturn, string separator )
 
   if ((token != RPAREN_T) && (token != EOF_T))
   {
-    codegen->writeCode( separator );
-    errors += stmt();
-    errors += stmt_list(shouldReturn, " + " );
+  	// cout << "here, separator: " << separator << endl;
+    // codegen->writeCode( separator );
+    errors += stmt( false, separator );
+    if ( token != RPAREN_T )
+    {
+    	codegen->writeCode( separator );
+    }
+    errors += stmt_list(shouldReturn, separator );
   }
 
   p2file << "Ending <stmt_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
@@ -485,7 +490,7 @@ int SyntacticalAnalyzer::quoted_lit()
 }
 
 
-int SyntacticalAnalyzer::action( bool shouldReturn )
+int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
 {
 /********************************************************************************/
 /* This function will check the rule at ACTION and also the current token.      */
@@ -553,6 +558,10 @@ int SyntacticalAnalyzer::action( bool shouldReturn )
   	token = lex->GetToken();
     errors += stmt();
     codegen->writeCode(")");
+    if ( shouldReturn )
+    {
+    	codegen->writeCode( ";\n" );
+    }
   }
   else if (token == NUMBERP_T)
   {
@@ -605,13 +614,16 @@ int SyntacticalAnalyzer::action( bool shouldReturn )
   }
   else if (token == PLUS_T)
   {
+  	separator = " + ";
     token = lex->GetToken();
     if ( shouldReturn )
     {
       codegen->writeCode( "__retVal = " );
       cout << "hereas;ldfkjasd;lf" << endl;
     }
-    errors += stmt_list( " + " );
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
     if ( shouldReturn )
     {
       codegen->writeCode( ";\n" );
@@ -619,15 +631,35 @@ int SyntacticalAnalyzer::action( bool shouldReturn )
   }
   else if (token == AND_T)
   {
-  	
+  	separator = " && ";
   	token = lex->GetToken();
-    errors += stmt_list();
+  	if ( shouldReturn )
+  	{
+  		codegen->writeCode( " __retVal = " );
+  	}
+  	codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+    	codegen->writeCode( ";\n" );
+    }
   }
   else if (token == OR_T)
   {
-  	
+  	separator = " || ";
   	token = lex->GetToken();
-    errors += stmt_list();
+  	if ( shouldReturn )
+  	{
+  		codegen->writeCode( " __retVal = " );
+  	}
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+    	codegen->writeCode( ";\n" );
+    }
   }
   else if (token == MULT_T)
   {
@@ -669,14 +701,34 @@ int SyntacticalAnalyzer::action( bool shouldReturn )
   {
   	codegen->callFunction( lex->GetLexeme() );
   	token = lex->GetToken();
-    errors += stmt_list();
+    errors += stmt_list( shouldReturn, ", ");
     codegen->writeCode(")");
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
   }
   else if(token == MINUS_T)
   {
+  	separator = " - ";
     token = lex->GetToken();
-    errors += stmt();
-    errors += stmt_list();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+      // cout << "hereas;ldfkjasd;lf" << endl;
+    }
+    codegen->writeCode( "(" );
+    errors += stmt( false, separator );
+    if ( token != RPAREN_T )
+    {
+    	codegen->writeCode( separator );
+    }
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
     if (token != RPAREN_T)
     {
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
