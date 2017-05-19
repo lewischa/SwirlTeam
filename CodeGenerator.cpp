@@ -180,19 +180,28 @@ void CodeGenerator::newline()
 
 void CodeGenerator::callFunction( string functionName )
 {
-	// indentCode();
+/********************************************************************************/
+/* This function calls a function with the name passed to it.                   */
+/********************************************************************************/
 	cppFile << functionName << "(";
 }
 
 
 void CodeGenerator::callListOp( string listop )
 {
+/********************************************************************************/
+/* This function calls the listop function with the listop as a string passed   */
+/* to it.													                    */
+/********************************************************************************/
 	cppFile << "listop( \"" << listop << "\", ";
 }
 
 
 void CodeGenerator::addParameter( string parameter )
 {
+/********************************************************************************/
+/* This function adds a parameter to the list of function parameters in params. */
+/********************************************************************************/
 	params.push_back( parameter );
 }
 
@@ -200,6 +209,10 @@ void CodeGenerator::addParameter( string parameter )
 
 void CodeGenerator::endParameters()
 {
+/********************************************************************************/
+/* This function marks the end of a param_list. Params are output to the .cpp   */
+/* file and the function signature is completed.			                    */
+/********************************************************************************/
 	for ( int i = 0; i < params.size(); i++ )
 	{
 		cppFile << "Object ";
@@ -228,6 +241,9 @@ void CodeGenerator::endParameters()
 
 void CodeGenerator::makeObject_begin()
 {
+/********************************************************************************/
+/* This function writes the code necessary to create an object.                 */
+/********************************************************************************/
 	cppFile << "Object(";
 }
 
@@ -235,6 +251,9 @@ void CodeGenerator::makeObject_begin()
 
 void CodeGenerator::makeObject_end()
 {
+/********************************************************************************/
+/* This function marks the end of a created object, and closes the parentheses. */
+/********************************************************************************/
 	cppFile << ")";
 }
 
@@ -242,12 +261,19 @@ void CodeGenerator::makeObject_end()
 
 void CodeGenerator::addToListStack( string listItem )
 {
+/********************************************************************************/
+/* This function adds items to a list stack.				                    */
+/********************************************************************************/
 	listStack.push_back( listItem );
 }
 
 
 void CodeGenerator::endList()
 {
+/********************************************************************************/
+/* This function marks the end of a list, and it writes the entire list to the  */
+/* .cpp file.												                    */
+/********************************************************************************/
 	cppFile << "(";
 	for ( int i = 0; i < listStack.size(); i++ )
 	{
@@ -266,6 +292,9 @@ void CodeGenerator::endList()
 
 void CodeGenerator::addIndent()
 {
+/********************************************************************************/
+/* This function increments the amount of indents used on new lines.            */
+/********************************************************************************/
 	numTabsIndented++;
 }
 
@@ -273,6 +302,9 @@ void CodeGenerator::addIndent()
 
 void CodeGenerator::minusIndent()
 {
+/********************************************************************************/
+/* This function decrements the amount of indents used on new lines.            */
+/********************************************************************************/
 	if (numTabsIndented > 0)
 	{
 		numTabsIndented--;
@@ -283,6 +315,9 @@ void CodeGenerator::minusIndent()
 
 void CodeGenerator::indentCode()
 {
+/********************************************************************************/
+/* This function writes the necessary number of spaces for indentation.         */
+/********************************************************************************/
 	for ( int i = 0; i < numTabsIndented; i++ )
 	{
 		cppFile << "    ";
@@ -292,6 +327,9 @@ void CodeGenerator::indentCode()
 
 void CodeGenerator::displayOutput()
 {
+/********************************************************************************/
+/* This function writes the initial code for (display 'some_thing)              */
+/********************************************************************************/
 	cppFile << "cout << ";
 }
 
