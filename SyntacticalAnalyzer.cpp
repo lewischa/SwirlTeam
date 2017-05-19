@@ -341,7 +341,16 @@ int SyntacticalAnalyzer::stmt ( bool shouldReturn, string separator )
   }
   else if (token == QUOTE_T)
   {
+  	if ( shouldReturn )
+  	{
+  		codegen->indentCode();
+  		codegen->writeCode( "__retVal = " );
+  	}
     errors += literal();
+    if ( shouldReturn )
+    {
+    	codegen->writeCode( ";\n" );
+    }
   }
   else if (token == NUMLIT_T)
   {
@@ -419,7 +428,7 @@ int SyntacticalAnalyzer::else_part()
   else
   {
   	codegen->else_begin();
-    errors += stmt(true);
+    errors += stmt(true, "");
     codegen->endControlStructure();
   }
 
@@ -453,9 +462,11 @@ int SyntacticalAnalyzer::literal()
     codegen->makeObject_begin();
     codegen->writeCode("\"");
     token = lex->GetToken();
-    codegen->writeCode(lex->GetLexeme());
-    codegen->writeCode("\"");
+    // codegen->writeCode(lex->GetLexeme());
+    // codegen->writeCode("\"");
     errors += quoted_lit();
+  	// codegen->writeCode( lex->GetLexeme() );
+    codegen->writeCode("\"");
     codegen->makeObject_end();
   //  codegen->writeCode(";");
   }
@@ -530,7 +541,7 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
     codegen->indentCode();
     if ( shouldReturn )
     {
-      // codegen->writeCode( "__retVal = " );
+      codegen->writeCode( "__retVal = " );
     }
     codegen->writeCode( "cons( Object(" );
     errors += stmt();
@@ -774,6 +785,11 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
   }
   else if (token == IDENT_T)
   {
+  	// codegen->indentCode();
+  	if ( shouldReturn )
+  	{
+  		codegen->writeCode( "__retVal = " );
+  	}
   	codegen->callFunction( lex->GetLexeme() );
   	token = lex->GetToken();
     errors += stmt_list( shouldReturn, ", ");
@@ -861,8 +877,10 @@ int SyntacticalAnalyzer::any_other_token ()
 
   if (token == LPAREN_T)
   {
+  	codegen->writeCode( lex->GetLexeme() );
     token = lex->GetToken();
     errors += more_tokens();
+    codegen->writeCode( lex->GetLexeme() );
     token = lex->GetToken();
   }
   else if (token == ERROR_T)
@@ -871,6 +889,7 @@ int SyntacticalAnalyzer::any_other_token ()
   }
   else
   {
+  	codegen->writeCode( lex->GetLexeme() + " " );
     token = lex->GetToken();
   }
 

@@ -129,7 +129,7 @@ void CodeGenerator::newline()
 
 void CodeGenerator::callFunction( string functionName )
 {
-	indentCode();
+	// indentCode();
 	cppFile << functionName << "(";
 }
 
