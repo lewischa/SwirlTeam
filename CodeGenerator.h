@@ -33,6 +33,7 @@ public:
 	void addIndent();
 	void minusIndent();
 	void indentCode();
+	void displayOutput();
 
 private:
 	ofstream cppFile;
