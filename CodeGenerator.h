@@ -1,3 +1,10 @@
+//	Authors:		Ivan Lim, Brooke Borges, Chad Lewis
+//	Class:			CS 460, Programming Languages
+//	Assignment:		Project 3
+//	File:			CodeGenerator.h
+//	Date:			Spring 2017
+
+
 #ifndef CG_H
 #define CG_H
 
@@ -19,6 +26,7 @@ public:
 	void returnCreatedObject( string );
 	void writeCode( string );
 	void callFunction( string );
+	void callListOp( string );
 	void addParameter( string );
 	void endParameters();
 	void makeObject_begin();

@@ -1,9 +1,9 @@
 /********************************************************************************/
-/* Project: Project 02: Syntactical Analyzer		 	                */
+/* Project: Project 02: Syntactical Analyzer		 	                        */
 /* Authorized Users/Secondary Authors: Team K: Ivan Lim, Brooke Borges,         */
 /*                                              Chad Lewis                      */
-/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu		        */
-/* Date: 16 April 2017				                                */
+/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu		                */
+/* Date: 16 April 2017				                                            */
 /* Description:	This program is meant to work in conjunction with the class     */
 /*              contained in the file LexicalAnalyzer.h. These classes will     */
 /*              read in scheme code from a .ss file and tokenize the lexemes    */
@@ -572,7 +572,7 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
   else if (token == LISTOP_T)
   {
   	// LISTOP STUFF HERE
-  	codegen->callFunction( lex->GetLexeme() );
+  	codegen->callListOp( lex->GetLexeme() );
   	token = lex->GetToken();
     errors += stmt();
     codegen->writeCode(")");

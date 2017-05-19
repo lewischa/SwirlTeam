@@ -1,3 +1,11 @@
+// 	Primary Author:			Marcia Watts
+//	Secondary Authors:		Ivan Lim, Brooke Borges, Chad Lewis
+//	Class:					CS 460, Programming Languages
+//	Assignment:				Project 3
+//	File:					Object.cpp
+//	Date:					Spring 2017
+
+
 #include "Object.h"
 #include <sstream>
 #include <cstdlib>
@@ -506,29 +514,7 @@ bool stringp (const Object & O)
 	return false;
 }
 
-Object car (const Object & O)
-{
-    try
-    {
-	if (O.type != LIST)
-		throw "type";
-	if (O.listval.size() < 1)
-		throw "size";
-	return O.listval[0];
-    }
-    catch (const char * message)
-    {
-	cout /*cerr*/ << "Wrong " << message << " for car function: " << O.name;
-	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
-	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
-	exit (1);
-    }
-}
-
-Object cdr (const Object & O)
+Object listop (const string & S, const Object & O)
 {
     try
     {
@@ -537,115 +523,31 @@ Object cdr (const Object & O)
 	if (O.listval.size() < 1)
 		throw "size";
 	Object T = O;
-	T.listval.erase (T.listval.begin());
-	T.MakeName ();
-	return T;
+	int i = S.length()-2;
+	while (S[i] == 'd')
+	{
+		T.listval.erase (T.listval.begin());
+		i--;
+	}
+	if (S[i] == 'a')
+		return T.listval[0];
+	else if (S[i] == 'c')
+	{
+		T.MakeName ();
+		return T;
+	}
+	cout << S << endl;
+	throw "name" + S;	
     }
     catch (const char * message)
     {
-	cout /*cerr*/ << "Wrong " << message << " for cdr function: " << O.name;
+	cerr << "Wrong " << message << " for list operation function: " << O.name;
 	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
+		cerr << " (" << nameof[O.type]<< ")"; 
 	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
-	exit (1);
-    }
-}
-
-Object cadr (const Object & O)
-{
-    try
-    {
-	if (O.type != LIST)
-		throw "type";
-	if (O.listval.size() < 2)
-		throw "size";
-	return O.listval[1];
-    }
-    catch (const char * message)
-    {
-	cout /*cerr*/ << "Wrong " << message << " for cadr function: " << O.name;
-	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
-	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
-	exit (1);
-    }
-}
-
-Object cddr (const Object & O)
-{
-    try
-    {
-	if (O.type != LIST)
-		throw "type";
-	if (O.listval.size() < 2)
-		throw "size";
-	Object T = O;
-	T.listval.erase (T.listval.begin());
-	T.listval.erase (T.listval.begin());
-	T.MakeName ();
-	return T;
-    }
-    catch (const char * message)
-    {
-	cout /*cerr*/ << "Wrong " << message << " for cddr function: " << O.name;
-	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
-	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
-	exit (1);
-    }
-}
-
-Object caddr (const Object & O)
-{
-    try
-    {
-	if (O.type != LIST)
-		throw "type";
-	if (O.listval.size() < 3)
-		throw "size";
-	return O.listval[2];
-    }
-    catch (const char * message)
-    {
-	cout /*cerr*/ << "Wrong " << message << " for caddr function: " << O.name;
-	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
-	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
-	exit (1);
-    }
-}
-
-Object cdddr (const Object & O)
-{
-    try
-    {
-	if (O.type != LIST)
-		throw "type";
-	if (O.listval.size() < 3)
-		throw "size";
-	Object T = O;
-	T.listval.erase (T.listval.begin());
-	T.listval.erase (T.listval.begin());
-	T.listval.erase (T.listval.begin());
-	T.MakeName ();
-	return T;
-    }
-    catch (const char * message)
-    {
-	cout /*cerr*/ << "Wrong " << message << " for cdddr function: " << O.name;
-	if (message[0] == 't')
-		cout /*cerr*/ << " (" << nameof[O.type]<< ")"; 
-	else if (message[0] == 's')
-		cout /*cerr*/ << " (" << O.listval.size() << ")"; 
-	cout /*cerr*/ << endl;
+		cerr << " (" << O.listval.size() << ")"; 
+	else if (message[0] == 'i')
+	cerr << endl;
 	exit (1);
     }
 }
@@ -695,8 +597,11 @@ Object::Object (stringstream & ss)
 			ss.get (achar);
 		if (achar == '(')
 			temp = Object (ss);
-		if (achar == ')')
+		else if (achar == ')')
+		{
 			endfound = true;
+			ss.get (achar);
+		}
 		else
 		{
 			string astring;
@@ -711,7 +616,10 @@ Object::Object (stringstream & ss)
 				temp = Object (astring);
 		}
 		if (temp.type != NONETYPE)
+		{
+			debug << "Adding " << temp << " to LIST Object\n";
 			listval.push_back (temp);
+		}
 	}
 	MakeName ();
 	debug << "name is " << name << endl;

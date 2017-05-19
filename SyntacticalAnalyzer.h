@@ -1,9 +1,9 @@
-/********************************************************************************/
-/* Project: 									*/
-/* Author: 									*/
-/* Date: 									*/
-/* Description:									*/
-/********************************************************************************/
+//	Authors:		Ivan Lim, Brooke Borges, Chad Lewis
+//	Class:			CS 460, Programming Languages
+//	Assignment:		Project 3
+//	File:			SyntacticalAnalyzer.cpp
+//	Date:			Spring 2017
+
 
 #ifndef SYN_H
 #define SYN_H
