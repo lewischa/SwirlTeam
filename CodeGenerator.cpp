@@ -233,7 +233,10 @@ void CodeGenerator::indentCode()
 }
 
 
-
+void CodeGenerator::displayOutput()
+{
+	cppFile << "cout << ";
+}
 
 
 

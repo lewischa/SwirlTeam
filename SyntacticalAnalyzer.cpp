@@ -1,9 +1,9 @@
 /********************************************************************************/
-/* Project: Project 02: Syntactical Analyzer					                          */
+/* Project: Project 02: Syntactical Analyzer		 	                */
 /* Authorized Users/Secondary Authors: Team K: Ivan Lim, Brooke Borges,         */
 /*                                              Chad Lewis                      */
-/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu			                  */
-/* Date: 16 April 2017								                                          */
+/* Author: Team B: Brooke Borges, Austin Lehrer, Ryan Yu		        */
+/* Date: 16 April 2017				                                */
 /* Description:	This program is meant to work in conjunction with the class     */
 /*              contained in the file LexicalAnalyzer.h. These classes will     */
 /*              read in scheme code from a .ss file and tokenize the lexemes    */
@@ -450,10 +450,14 @@ int SyntacticalAnalyzer::literal()
   }
   else if (token == QUOTE_T)
   {
-  	codegen->makeObject_begin();
+    codegen->makeObject_begin();
+    codegen->writeCode("\"");
     token = lex->GetToken();
+    codegen->writeCode(lex->GetLexeme());
+    codegen->writeCode("\"");
     errors += quoted_lit();
     codegen->makeObject_end();
+  //  codegen->writeCode(";");
   }
   else
   {
@@ -547,9 +551,12 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
   }
   else if (token == DISPLAY_T)
   {
+	codegen->indentCode();
   	// DISPLAY STUFF HERE
+  	codegen->writeCode("cout << ");
   	token = lex->GetToken();
     errors += stmt();
+	codegen->writeCode(";\n");
   }
   else if (token == LISTOP_T)
   {
@@ -619,7 +626,6 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
     if ( shouldReturn )
     {
       codegen->writeCode( "__retVal = " );
-      cout << "hereas;ldfkjasd;lf" << endl;
     }
     codegen->writeCode( "(" );
     errors += stmt_list( false, separator );
@@ -663,39 +669,108 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
   }
   else if (token == MULT_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " * ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
   }
   else if (token == EQUALTO_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " == ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+
   }
   else if (token == GT_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " > ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+
+
   }
   else if (token == LT_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " < ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+
   }
   else if (token == GTE_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " >= ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+
+
   }
   else if (token == LTE_T)
   {
-  	
-  	token = lex->GetToken();
-    errors += stmt_list();
+    separator = " <= ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+
+
+
   }
   else if (token == IDENT_T)
   {
@@ -711,6 +786,32 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
   else if(token == MINUS_T)
   {
   	separator = " - ";
+    token = lex->GetToken();
+    if ( shouldReturn )
+    {
+      codegen->writeCode( "__retVal = " );
+    }
+    codegen->writeCode( "(" );
+    errors += stmt( false, separator );
+    if ( token != RPAREN_T )
+    {
+    	codegen->writeCode( separator );
+    }
+    errors += stmt_list( false, separator );
+    codegen->writeCode( ")" );
+    if ( shouldReturn )
+    {
+      codegen->writeCode( ";\n" );
+    }
+    if (token != RPAREN_T)
+    {
+      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+      errors++; 
+    }
+  }
+  else if (token == DIV_T)
+  {
+ separator = " / ";
     token = lex->GetToken();
     if ( shouldReturn )
     {
@@ -734,18 +835,8 @@ int SyntacticalAnalyzer::action( bool shouldReturn, string separator )
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
       errors++; 
     }
-  }
-  else if (token == DIV_T)
-  {
-  	token = lex->GetToken();
-    errors += stmt();
-    errors += stmt_list();
-    if (token != RPAREN_T)
-    {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-      errors++; 
-    }
-  }
+
+ }
 
  p2file << "Ending <action>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
  
